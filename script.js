@@ -5,18 +5,30 @@ const dots = [...document.querySelectorAll('.progress button')];
 let current = 0;
 let locked = false;
 
+function updateDots(index) {
+    dots.forEach((d, n) => {
+        d.classList.toggle('active', n === index);
+    });
+}
+
 function go(i) {
     i = Math.max(0, Math.min(screens.length - 1, i));
+
+    if (i === current && locked) return;
+
     current = i;
+    updateDots(i);
 
-    screens[i].scrollIntoView({
-        behavior: 'smooth',
-        inline: 'start'
+    locked = true;
+
+    exp.scrollTo({
+        left: i * window.innerWidth,
+        behavior: 'smooth'
     });
 
-    dots.forEach((d, n) => {
-        d.classList.toggle('active', n === i);
-    });
+    setTimeout(() => {
+        locked = false;
+    }, 750);
 }
 
 document.querySelectorAll('[data-next]').forEach(b => {
@@ -28,21 +40,22 @@ dots.forEach(d => {
 });
 
 exp.addEventListener('scroll', () => {
-    const i = Math.round(exp.scrollLeft / innerWidth);
+    if (locked) return;
+
+    const i = Math.round(
+        exp.scrollLeft / window.innerWidth
+    );
 
     if (i !== current) {
         current = i;
-
-        dots.forEach((d, n) => {
-            d.classList.toggle('active', n === i);
-        });
+        updateDots(i);
     }
 });
 
 const env = document.getElementById('envelope');
 
 exp.addEventListener('wheel', e => {
-    // Permite rolar a carta normalmente quando ela estiver aberta
+    // Quando a carta estiver aberta, permite rolar o texto normalmente
     if (
         env.classList.contains('open') &&
         e.target.closest('.paper')
@@ -55,24 +68,25 @@ exp.addEventListener('wheel', e => {
     }
 
     e.preventDefault();
-    locked = true;
 
-    go(current + (e.deltaY > 0 ? 1 : -1));
-
-    setTimeout(() => {
-        locked = false;
-    }, 700);
+    go(
+        current + (e.deltaY > 0 ? 1 : -1)
+    );
 }, {
     passive: false
 });
 
 addEventListener('keydown', e => {
-    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+    if (
+        ['ArrowRight', 'PageDown', ' '].includes(e.key)
+    ) {
         e.preventDefault();
         go(current + 1);
     }
 
-    if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+    if (
+        ['ArrowLeft', 'PageUp'].includes(e.key)
+    ) {
         e.preventDefault();
         go(current - 1);
     }
@@ -82,7 +96,7 @@ addEventListener('keydown', e => {
     }
 
     if (e.key === 'End') {
-        go(5);
+        go(screens.length - 1);
     }
 });
 
@@ -105,14 +119,22 @@ exp.addEventListener('touchend', e => {
         return;
     }
 
-    const x = e.changedTouches[0].clientX - sx;
-    const y = e.changedTouches[0].clientY - sy;
+    if (locked) return;
 
+    const x =
+        e.changedTouches[0].clientX - sx;
+
+    const y =
+        e.changedTouches[0].clientY - sy;
+
+    // Só considera gesto horizontal
     if (
         Math.abs(x) > 50 &&
         Math.abs(x) > Math.abs(y)
     ) {
-        go(current + (x < 0 ? 1 : -1));
+        go(
+            current + (x < 0 ? 1 : -1)
+        );
     }
 }, {
     passive: true
@@ -143,16 +165,26 @@ const msgs = [
 
 let mi = 0;
 
-const card = document.querySelector('.message-card');
-const msg = document.getElementById('comfortMessage');
-const sub = document.getElementById('comfortSub');
-const counter = document.getElementById('counter');
-const dotsBox = document.getElementById('dots');
+const card =
+    document.querySelector('.message-card');
+
+const msg =
+    document.getElementById('comfortMessage');
+
+const sub =
+    document.getElementById('comfortSub');
+
+const counter =
+    document.getElementById('counter');
+
+const dotsBox =
+    document.getElementById('dots');
 
 msgs.forEach((_, i) => {
     const d = document.createElement('span');
 
-    d.className = 'dot' + (!i ? ' active' : '');
+    d.className =
+        'dot' + (!i ? ' active' : '');
 
     dotsBox.appendChild(d);
 });
@@ -164,11 +196,17 @@ function show(i) {
 
     setTimeout(() => {
         msg.textContent = msgs[mi][0];
+
         sub.textContent = msgs[mi][1];
-        counter.textContent = `${mi + 1} / ${msgs.length}`;
+
+        counter.textContent =
+            `${mi + 1} / ${msgs.length}`;
 
         [...dotsBox.children].forEach((d, n) => {
-            d.classList.toggle('active', n === mi);
+            d.classList.toggle(
+                'active',
+                n === mi
+            );
         });
 
         card.classList.remove('changing');
