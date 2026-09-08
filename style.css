@@ -712,7 +712,7 @@ button {
     }
 
     .photo-frame {
-        width: min(55vw, 270px);
+        width: min(50vw, 260px);
         top: 16%;
     }
 
