@@ -712,8 +712,8 @@ button {
     }
 
     .photo-frame {
-        width: min(50vw, 260px);
-        top: 16%;
+        width: min(58vw, 250px);
+        top: 14%;
     }
 
     .star-message {
