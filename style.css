@@ -712,8 +712,8 @@ button {
     }
 
     .photo-frame {
-        width: min(66vw, 330px);
-        top: 19%
+        width: min(30vw, 150px);
+        top: 16%;
     }
 
     .star-message {
@@ -793,6 +793,7 @@ button {
         scroll-behavior: auto !important
     }
 }
+
 .final-text {
     font-weight: 300;
     letter-spacing: 0.08em;
